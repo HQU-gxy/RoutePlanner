@@ -6,7 +6,7 @@ import copy
 from math import floor
 from tkinter import (HORIZONTAL, Canvas, PhotoImage, IntVar, StringVar, Tk,
                      Toplevel, colorchooser, messagebox)
-from tkinter.ttk import (Button, Entry, Frame, Label, Separator, Radiobutton)
+from tkinter.ttk import (Button, Entry, Frame, Label, Separator, Radiobutton,)
 
 from models import Node, Tool, Graph, Connection, draw
 
@@ -28,6 +28,7 @@ class ToolBar(Tk):
     """
     The toolbar class
     """
+
     def __init__(self, graph=None):
         super().__init__()
         self.title('Toolbar')
@@ -58,6 +59,7 @@ class ToolBar(Tk):
 
 class DijkstraFrame(Toplevel):
     """Dijkstra Frame class"""
+
     def __init__(self, master=None, graph=None):
         super().__init__(master=master)
         self.graph = graph
@@ -69,18 +71,20 @@ class DijkstraFrame(Toplevel):
 
     def _init_ui(self):
         length = len(self.graph.nodes)
-        Label(self, text='Find the shortest path').grid(
-            row=0, column=0, columnspan=2, sticky='w')
+        Label(self, text='Find the shortest path', font=('Consolas', 20, 'bold')).grid(
+            row=0, column=0, columnspan=2, sticky='w',padx=10,pady=10)
 
         Separator(self, orient=HORIZONTAL).grid(
             row=1, column=0, columnspan=2, sticky='nsew')
 
-        Label(self, text='Start node').grid(row=2, column=0, sticky='w')
+        Label(self, text='Start node', font=('Consolas', 18, 'bold')).grid(
+            row=2, column=0, sticky='w',padx=10)
         for i, node in enumerate(self.graph.nodes):
             Radiobutton(self, text=str(node), variable=self._f_node_var,
                         value=node.node_id).grid(row=3+i, column=1, sticky='w')
 
-        Label(self, text='End node').grid(row=3+length, column=0, sticky='w')
+        Label(self, text='End node', font=('Consolas', 18, 'bold')).grid(
+            row=3+length, column=0, sticky='w',padx=10)
         for i, node in enumerate(self.graph.nodes):
             Radiobutton(self, text=str(node), variable=self._l_node_var,
                         value=node.node_id).grid(row=4+length+i, column=1, sticky='w')
@@ -125,8 +129,10 @@ class DijkstraFrame(Toplevel):
                 conn.enable_highlight()
             # ?new feature: print the distances to other nodes in a table graphically
 
+
 class NodeConfigurationFrame(Toplevel):
     """Node configuration frame class"""
+
     def __init__(self, master: Frame = None, graph: Graph = None, node: Node = None):
         super().__init__(master=master)
 
@@ -201,6 +207,7 @@ class NodeConfigurationFrame(Toplevel):
 
 class NodeConnectionConfigRow(Frame):
     """Node connection config row class"""
+
     def __init__(self, master=None, node=None, connection=None):
         super().__init__(master=master)
         self.node = node
@@ -225,6 +232,7 @@ class NodeConnectionConfigRow(Frame):
 
 class MoveTool(Tool):
     """Move tool class"""
+
     def __init__(self, master=None, graph=None):
         super().__init__(master, graph)
         self.master = master
@@ -260,6 +268,7 @@ class MoveTool(Tool):
 
 class AddNodeTool(Tool):
     """Add node tool class"""
+
     def __init__(self, master=None, graph=None):
         super().__init__(master, graph)
         self.master = master
@@ -283,6 +292,7 @@ class AddNodeTool(Tool):
 
 class ConnectionTool(Tool):
     """Connection tool class"""
+
     def __init__(self, master=None, graph=Graph):
         super().__init__(master, graph)
         self.master = master
@@ -328,6 +338,7 @@ class ConnectionTool(Tool):
 
 class DeleteTool(Tool):
     """Delete tool class"""
+
     def __init__(self, master=None, graph=None):
         super().__init__(master, graph)
         self.master = master

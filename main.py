@@ -6,11 +6,11 @@ import os
 import pygame
 from pygame.locals import QUIT, MOUSEMOTION, MOUSEBUTTONUP, MOUSEBUTTONDOWN
 
-from models import Graph
+from models import Graph, Node, Connection
 from views import ToolBar
 
 RUNNING = True
-BACKGROUND_COLOR = (240, 240, 240)
+bg=pygame.image.load("bg.png")
 
 
 def quit_callback():
@@ -19,6 +19,7 @@ def quit_callback():
     """
     global RUNNING
     RUNNING = False
+
 
 def on_node_hover(graph):
     """
@@ -29,8 +30,9 @@ def on_node_hover(graph):
         if node.pos[0] <= pygame.mouse.get_pos()[0]+node.radius and \
             node.pos[0] >= pygame.mouse.get_pos()[0]-node.radius and \
                 node.pos[1] <= pygame.mouse.get_pos()[1]+node.radius and \
-                    node.pos[1] >= pygame.mouse.get_pos()[1]-node.radius:
+        node.pos[1] >= pygame.mouse.get_pos()[1]-node.radius:
             node.hovered = True
+
 
 def main():
     """
@@ -45,27 +47,38 @@ def main():
     pygame.init()
     pygame.font.init()
 
+    # Add the Nodes and Connections
+    nodesPreset = [Node('a', (50, 150)), Node('b', (50, 300)),
+                   Node('c', (200,150)), Node('d', (200,300))]
+    
+    connectionPreset = [Connection((nodesPreset[0], nodesPreset[1]), 4, (0, 50, 50)),
+                        Connection((nodesPreset[0], nodesPreset[2]), 3, (0, 50, 50)),
+                        Connection((nodesPreset[1], nodesPreset[2]), 2, (0, 50, 50)),
+                        Connection((nodesPreset[1], nodesPreset[3]), 1, (0, 50, 50)),
+                        Connection((nodesPreset[2], nodesPreset[3]), 5, (0, 50, 50))
+                        ]
+    graph = Graph(nodesPreset, connectionPreset)
+
     # initialize tkinter
-    graph = Graph()
     toolbar = ToolBar(graph)
     toolbar.geometry(
-        f'{toolbar.winfo_width()}x{toolbar.winfo_height()}+100+600')
+        f'{toolbar.winfo_width()}x{toolbar.winfo_height()}+1+600')
     toolbar.protocol("WM_DELETE_WINDOW", quit_callback)
 
     # start pygame clock
     clock = pygame.time.Clock()
 
     # initialize variables
-    font = pygame.font.SysFont(None, 25)
+    font = pygame.font.SysFont("Consolas", 15)
     framerate = 30
     double_click_duration = 150  # ms
     last_click = 0
 
     # sets the window title
     screen = pygame.display.set_caption('Dijkstra 2019-2020')
-
+    
     # sets the window size
-    screen = pygame.display.set_mode((500, 500))
+    screen = pygame.display.set_mode((1022, 752))
 
     while RUNNING:
         for event in pygame.event.get():
@@ -87,7 +100,7 @@ def main():
 
         # Rendering
         clock.tick(framerate)
-        screen.fill(BACKGROUND_COLOR)
+        screen.blit(bg,(0,0))
 
         toolbar.tool.render_preview(screen)
 

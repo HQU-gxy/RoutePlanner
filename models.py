@@ -32,8 +32,8 @@ class Node:
     def __init__(self, text='', pos=(0, 0)):
         self._id = Node.node_ids
         self.pos = pos
-        self.radius = 20
-        self.color = (255, 0, 0)
+        self.radius = 10
+        self.color = (255, 153, 102)
         self.text = text
         self.hovered = False
         self.selected = False
@@ -67,7 +67,7 @@ class Node:
 
         # drawing the text
         label = font.render(self.text, 1, (0, 0, 0))
-        screen.blit(label, (self.pos[0]-6, self.pos[1]-5))
+        screen.blit(label, (self.pos[0]-5, self.pos[1]-5))
 
     def add_neighbor(self, node):
         """
