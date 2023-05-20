@@ -24,7 +24,7 @@ def mouse_on_a_node(pos, nodes) -> Node:
     return None
 
 
-class ToolBar(Tk):
+class ToolBar(Toplevel):
     """
     The toolbar class
     """
@@ -46,6 +46,7 @@ class ToolBar(Tk):
         self.tools.append(AddNodeTool(self, self.graph))
         self.tools.append(ConnectionTool(self, self.graph))
         self.tools.append(DeleteTool(self, self.graph))
+        self.tools.append(PrintAllConnectionsTool(self, self.graph))
 
     def _init_ui(self):
         for i, tool in enumerate(self.tools):
@@ -54,16 +55,16 @@ class ToolBar(Tk):
             row=0, column=len(self.tools), sticky='nsew')
 
     def _open_shorest_path_win(self):
-        DijkstraFrame(self.master, self.graph)
+        PathMenu(self.master, self.graph)
 
 
-class DijkstraFrame(Toplevel):
+class PathMenu(Tk):
     """Dijkstra Frame class"""
 
-    def __init__(self, master=None, graph=None):
-        super().__init__(master=master)
+    def __init__(self, graph=None):
+        super().__init__()
         self.graph = graph
-        self.title('Dijkstra - Find the shortest path')
+        self.title('路径规划')
 
         self._f_node_var = IntVar()
         self._l_node_var = IntVar()
@@ -71,29 +72,29 @@ class DijkstraFrame(Toplevel):
 
     def _init_ui(self):
         length = len(self.graph.nodes)
-        Label(self, text='Find the shortest path', font=('Consolas', 20, 'bold')).grid(
-            row=0, column=0, columnspan=2, sticky='w',padx=10,pady=10)
+        Label(self, text='选择起点和终点', font=('Microsoft Yahei', 20, 'bold')).grid(
+            row=0, column=0, columnspan=2, sticky='w', padx=10, pady=10)
 
         Separator(self, orient=HORIZONTAL).grid(
             row=1, column=0, columnspan=2, sticky='nsew')
 
-        Label(self, text='Start node', font=('Consolas', 18, 'bold')).grid(
-            row=2, column=0, sticky='w',padx=10)
+        Label(self, text='起点', font=('Microsoft Yahei', 18, 'bold')).grid(
+            row=2, column=0, sticky='w', padx=10)
         for i, node in enumerate(self.graph.nodes):
-            Radiobutton(self, text=str(node), variable=self._f_node_var,
-                        value=node.node_id).grid(row=3+i, column=1, sticky='w')
+            if node.isPlace:
+                Radiobutton(self, text=node.text, variable=self._f_node_var,
+                            value=node.node_id).grid(row=3+i, column=1, sticky='w')
 
-        Label(self, text='End node', font=('Consolas', 18, 'bold')).grid(
-            row=3+length, column=0, sticky='w',padx=10)
+        Label(self, text='终点', font=('Microsoft Yahei', 18, 'bold')).grid(
+            row=3+length, column=0, sticky='w', padx=10)
         for i, node in enumerate(self.graph.nodes):
-            Radiobutton(self, text=str(node), variable=self._l_node_var,
-                        value=node.node_id).grid(row=4+length+i, column=1, sticky='w')
+            if node.isPlace:
+                Radiobutton(self, text=node.text, variable=self._l_node_var,
+                            value=node.node_id).grid(row=4+length+i, column=1, sticky='w')
 
         Separator(self, orient=HORIZONTAL).grid(
             row=length*2+4, column=0, columnspan=2, sticky='nsew')
 
-        Button(self, text='Cancel', command=self.destroy).grid(
-            row=length*2+5, column=0)
         Button(self, text='Calculate', command=self._calculate).grid(
             row=length*2+5, column=1)
         Button(self, text='Reset', command=self._reset).grid(
@@ -230,6 +231,25 @@ class NodeConnectionConfigRow(Frame):
             print(err)
 
 
+class PrintAllConnectionsTool(Tool):
+
+    def __init__(self, master=None, graph=None):
+        super().__init__(master, graph)
+        self.master = master
+        self.graph = graph
+
+        self.image = PhotoImage(file=r"images/add_node.png")
+        self.image = self.image.subsample(3, 3)
+
+        self.button = Button(self.master, text="Print Connections",
+                             image=self.image, command=self.on_click)
+
+    def on_click(self):
+        print("Connections:")
+        for c in self.graph.connections:
+            print(c.nodes[0].text, c.nodes[1].text)
+
+
 class MoveTool(Tool):
     """Move tool class"""
 
@@ -251,12 +271,13 @@ class MoveTool(Tool):
 
     def handle_mouse_down(self, event, double_click=False):
         self._selected_node = mouse_on_a_node(event.pos, self.graph.nodes)
-
-        if double_click and self._selected_node:
-            self._selected_node.selected = True
-            config_frame = NodeConfigurationFrame(
-                self.master, self.graph, self._selected_node)
-            config_frame.geometry('250x250+600+600')
+        if self._selected_node:
+            print("Node('a',{}),".format(self._selected_node.pos))
+            if double_click:
+                self._selected_node.selected = True
+                config_frame = NodeConfigurationFrame(
+                    self.master, self.graph, self._selected_node)
+                config_frame.geometry('250x250+600+600')
 
     def handle_mouse_up(self, event):
         self._selected_node = None
@@ -287,6 +308,8 @@ class AddNodeTool(Tool):
         if event.button == 1:
             if mouse_on_a_node(event.pos, self.graph.nodes) is None:
                 node = Node(text='?', pos=event.pos)
+                node.color = (100, 20, 200)
+                node.radius = 5
                 self.graph.nodes.append(node)
 
 

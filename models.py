@@ -29,15 +29,15 @@ class Node:
     """
     node_ids = 0
 
-    def __init__(self, text='', pos=(0, 0)):
+    def __init__(self, text='', pos=(0, 0), isPlace=False):
         self._id = Node.node_ids
         self.pos = pos
-        self.radius = 10
-        self.color = (255, 153, 102)
+        self.radius = 10 if isPlace else 5
+        self.color = (255, 153, 102) if isPlace else (100, 20, 140)
         self.text = text
         self.hovered = False
         self.selected = False
-
+        self.isPlace = isPlace
         self._neighbors = []
 
         Node.node_ids += 1
@@ -66,8 +66,8 @@ class Node:
         draw.circle(screen, (0, 0, 0), self.pos, self.radius, width)
 
         # drawing the text
-        label = font.render(self.text, 1, (0, 0, 0))
-        screen.blit(label, (self.pos[0]-5, self.pos[1]-5))
+        # label = font.render(self.text, 1, (0, 0, 0))
+        # screen.blit(label, (self.pos[0]-5, self.pos[1]-5))
 
     def add_neighbor(self, node):
         """
@@ -79,7 +79,8 @@ class Node:
         """
         This method removes the given node object from the node's neighbors.
         """
-        self._neighbors = [neighbor for neighbor in self._neighbors if neighbor[0] != node]
+        self._neighbors = [
+            neighbor for neighbor in self._neighbors if neighbor[0] != node]
 
     @property
     def node_id(self):
@@ -108,12 +109,12 @@ class Node:
     def __repr__(self):
         return str(self)
 
-
 class Connection:
     """
     Connection class
     """
     HIGHLIGHT_COLOR = (255, 0, 0)
+
     def __init__(self, nodes=(None, None), weight=0, color=(0, 0, 0)):
         self.nodes = nodes
         self.nodes[0].add_neighbor((self.nodes[1], self))
@@ -151,7 +152,8 @@ class Connection:
 
         # drawing the highlight
         if self._highlighted:
-            draw.line(screen, Connection.HIGHLIGHT_COLOR, node_1_pos, node_2_pos, 6)
+            draw.line(screen, Connection.HIGHLIGHT_COLOR,
+                      node_1_pos, node_2_pos, 6)
 
         # drawing the line
         draw.line(screen, self.color, node_1_pos, node_2_pos, 2)
@@ -174,6 +176,7 @@ class Connection:
 
 class Graph:
     """Graph class"""
+
     def __init__(self, nodes=None, connections=None):
         self.nodes = nodes
         if self.nodes is None:
@@ -194,8 +197,10 @@ class Graph:
         second_node.remove_neighbor(first_node)
         self.connections.remove(connection)
 
+
 class Tool:
     """Tool class"""
+
     def __init__(self, _master=None, _graph=None):
         super().__init__()
 
