@@ -95,9 +95,9 @@ class PathMenu(Tk):
         Separator(self, orient=HORIZONTAL).grid(
             row=length*2+4, column=0, columnspan=2, sticky='nsew')
 
-        Button(self, text='Calculate', command=self._calculate).grid(
+        Button(self, text='Let\'s go!', command=self._calculate).grid(
             row=length*2+5, column=1)
-        Button(self, text='Reset', command=self._reset).grid(
+        Button(self, text='清除', command=self._reset).grid(
             row=length*2+6, column=1)
 
     def _reset(self):
@@ -110,7 +110,7 @@ class PathMenu(Tk):
 
         if f_node_id == l_node_id:
             messagebox.showerror(
-                'Error calculating path', 'You should select different nodes for calculations')
+                '不彳亍', '起点和终点不能相同')
         else:
             f_node = l_node = None
             for node in self.graph.nodes:
